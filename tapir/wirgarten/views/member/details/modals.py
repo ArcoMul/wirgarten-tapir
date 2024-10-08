@@ -116,6 +116,7 @@ def get_pickup_location_choice_form(request, **kwargs):
     @transaction.atomic
     def update_pickup_location(form):
         pickup_location_id = form.cleaned_data["pickup_location"].id
+        previous_pickup_location = member.pickup_location
         change_date = (
             calculate_pickup_location_change_date()
             if member.pickup_location is not None
@@ -144,7 +145,7 @@ def get_pickup_location_choice_form(request, **kwargs):
         TextLogEntry().populate(
             actor=request.user,
             user=member,
-            text=f"Abholort geändert zum {change_date_str}: {member.pickup_location} -> {pl}",
+            text=f"Abholort geändert zum {change_date_str}: {previous_pickup_location} -> {pl}",
         ).save()
 
         TransactionalTrigger.fire_action(
